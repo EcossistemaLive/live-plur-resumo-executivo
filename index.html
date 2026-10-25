@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resumo Executivo & Sistemas — Plur Movimento | Live Consultoria</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Merriweather:ital,wght@0,300;0,400;0,700;1,300&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #f8fafc;
+            --bg-card: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --brand-primary: #06192a;
+            --brand-accent: #00e800;
+            --brand-accent-hover: #00c700;
+            --border-color: #e2e8f0;
+            --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04);
+            --radius-lg: 16px;
+            --radius-md: 12px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-main);
+            line-height: 1.8;
+            padding-bottom: 80px;
+        }
+
+        /* Top Progress Bar */
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--brand-primary), var(--brand-accent));
+            width: 0%;
+            z-index: 1000;
+            transition: width 0.1s ease-out;
+        }
+
+        /* Header */
+        header {
+            background: linear-gradient(135deg, #06192a 0%, #0f2d4a 100%);
+            color: #ffffff;
+            padding: 80px 20px 60px 20px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            border-bottom: 4px solid var(--brand-accent);
+        }
+
+        header::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image: radial-gradient(rgba(255,255,255,0.05) 1px, transparent 1px);
+            background-size: 24px 24px;
+            opacity: 0.4;
+        }
+
+        .header-content {
+            max-width: 900px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .badge-client {
+            display: inline-block;
+            background: rgba(0, 232, 0, 0.15);
+            color: #4ade80;
+            padding: 6px 16px;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(0, 232, 0, 0.3);
+        }
+
+        h1 {
+            font-family: 'Merriweather', serif;
+            font-size: 2.75rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+            letter-spacing: -0.5px;
+        }
+
+        p.subtitle {
+            font-size: 1.15rem;
+            color: #cbd5e1;
+            max-width: 700px;
+            margin: 0 auto 30px auto;
+            font-weight: 300;
+        }
+
+        .meta-info {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            font-size: 0.9rem;
+            color: #94a3b8;
+            flex-wrap: wrap;
+        }
+
+        .meta-info span {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* Container */
+        .container {
+            max-width: 1000px;
+            margin: -40px auto 0 auto;
+            padding: 0 20px;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Card Section */
+        .card {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            padding: 40px;
+            margin-bottom: 30px;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border-color);
+        }
+
+        h2 {
+            font-family: 'Merriweather', serif;
+            font-size: 1.8rem;
+            color: var(--brand-primary);
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        p {
+            font-size: 1.05rem;
+            color: var(--text-main);
+            margin-bottom: 20px;
+        }
+
+        /* Systems Grid */
+        .systems-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            margin-top: 25px;
+        }
+
+        .system-card {
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 24px;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .system-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md);
+            border-color: var(--brand-primary);
+        }
+
+        .system-card h3 {
+            font-size: 1.2rem;
+            color: var(--brand-primary);
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .system-card p {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            margin-bottom: 20px;
+        }
+
+        .btn-system {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background: var(--brand-primary);
+            color: #ffffff;
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.9rem;
+            transition: background 0.2s;
+        }
+
+        .btn-system:hover {
+            background: #0f2d4a;
+            color: var(--brand-accent);
+        }
+
+        /* Timeline / Journey */
+        .timeline {
+            position: relative;
+            padding-left: 30px;
+            margin-top: 25px;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 7px;
+            top: 5px;
+            bottom: 5px;
+            width: 3px;
+            background: #cbd5e1;
+            border-radius: 3px;
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 30px;
+        }
+
+        .timeline-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .timeline-dot {
+            position: absolute;
+            left: -30px;
+            top: 4px;
+            width: 15px;
+            height: 15px;
+            background: var(--brand-primary);
+            border: 3px solid #ffffff;
+            border-radius: 50%;
+            box-shadow: 0 0 0 2px var(--brand-primary);
+        }
+
+        .timeline-content h4 {
+            font-size: 1.1rem;
+            color: var(--brand-primary);
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
+
+        .timeline-content p {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            margin-bottom: 0;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            margin-top: 60px;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        footer strong {
+            color: var(--brand-primary);
+        }
+
+        @media (max-width: 768px) {
+            h1 { font-size: 2.1rem; }
+            .container { margin-top: -20px; padding: 0 15px; }
+            .card { padding: 25px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="progress-bar" id="progressBar"></div>
+
+    <header>
+        <div class="header-content">
+            <div class="badge-client">Cliente: Plur Movimento</div>
+            <h1>Resumo Executivo & Sistemas</h1>
+            <p class="subtitle">Consolidação estratégica da consultoria Live e ecossistema de aplicações desenvolvidas para a Plur Training Center.</p>
+            <div class="meta-info">
+                <span>📅 Outubro de 2026</span>
+                <span>🏛️ Live Consultoria & Ecossistema Live</span>
+                <span>🔒 Área Executiva Restrita</span>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+
+        <!-- Visão Geral -->
+        <div class="card">
+            <h2>🎯 Visão Geral da Parceria</h2>
+            <p>
+                A parceria entre a <strong>Live Consultoria</strong> e a <strong>Plur Movimento</strong> (Plur Training Center) abrangeu reestruturação estratégica, governança corporativa, acordos societários, modelagem operacional, além da criação e implantação de um ecossistema digital robusto com ferramentas customizadas para otimizar a recepção, rotinas internas, atendimento e projetos especiais.
+            </p>
+            <p>
+                Esta página centraliza o histórico das entregas e fornece acesso direto a todos os sistemas, protótipos e dashboards desenvolvidos pela equipe técnica da Live.
+            </p>
+        </div>
+
+        <!-- Sistemas e Aplicações -->
+        <div class="card">
+            <h2>⚡ Ecossistema de Sistemas & Páginas Desenvolvidas</h2>
+            <p>Abaixo estão listados os links de acesso aos sistemas, dashboards e landing pages criados para a Plur ao longo da consultoria:</p>
+
+            <div class="systems-grid">
+                <!-- Sistema 1 -->
+                <div class="system-card">
+                    <div>
+                        <h3>📊 Dashboard de Gestão</h3>
+                        <p>Painel kanban de acompanhamento de demandas e status executivo do projeto.</p>
+                    </div>
+                    <a href="https://ecossistemalive.github.io/live-plur-resumo-executivo/dashboard.html" target="_blank" class="btn-system">Acessar Sistema →</a>
+                </div>
+
+                <!-- Sistema 2 -->
+                <div class="system-card">
+                    <div>
+                        <h3>⚙️ Sistema de Rotinas</h3>
+                        <p>Plataforma operacional para padronização e controle das rotinas diárias da equipe.</p>
+                    </div>
+                    <a href="https://ecossistemalive.github.io/live-plur-resumo-executivo/sistema-rotinas/index.html" target="_blank" class="btn-system">Acessar Sistema →</a>
+                </div>
+
+                <!-- Sistema 3 -->
+                <div class="system-card">
+                    <div>
+                        <h3>🌊 Projeto Surfland Flamboyant</h3>
+                        <p>Apresentação executiva e materiais estratégicos do projeto Surf Park / Flamboyant.</p>
+                    </div>
+                    <a href="https://ecossistemalive.github.io/live-plur-resumo-executivo/projeto-surfland-flamboyant/apresentacao.html" target="_blank" class="btn-system">Acessar Sistema →</a>
+                </div>
+
+                <!-- Sistema 4 -->
+                <div class="system-card">
+                    <div>
+                        <h3>🎾 Projeto Padel & Kaza</h3>
+                        <p>Documentação, identidade visual e estruturação para o segmento de Padel.</p>
+                    </div>
+                    <a href="https://ecossistemalive.github.io/live-plur-resumo-executivo/projeto-rodrigo-padel/index.html" target="_blank" class="btn-system">Acessar Sistema →</a>
+                </div>
+
+                <!-- Sistema 5 -->
+                <div class="system-card">
+                    <div>
+                        <h3>📚 Landing — Anatomia Palpatória</h3>
+                        <p>Página de alta conversão para o curso especializado de Anatomia Palpatória.</p>
+                    </div>
+                    <a href="https://ecossistemalive.github.io/live-plur-resumo-executivo/landing-anatomia-palpatoria/index.html" target="_blank" class="btn-system">Acessar Sistema →</a>
+                </div>
+
+                <!-- Sistema 6 -->
+                <div class="system-card">
+                    <div>
+                        <h3>🚀 Plano Operacional</h3>
+                        <p>Mapeamento completo de processos, fluxos de atendimento e eficiência operacional.</p>
+                    </div>
+                    <a href="https://ecossistemalive.github.io/live-plur-resumo-executivo/plano-operacional-pages/index.html" target="_blank" class="btn-system">Acessar Sistema →</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Marcos da Jornada -->
+        <div class="card">
+            <h2>🗺️ Marcos Principais da Jornada</h2>
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <h4>Alinhamento Societário e Acordos</h4>
+                        <p>Mediação e formalização jurídica, incluindo reestruturação societária, termo de acordo e quitação integral.</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <h4>Estruturação Operacional & Recepção</h4>
+                        <p>Criação de roteiro de entrevista para recepcionistas, rotinas diárias e manuais de atendimento.</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <h4>Desenvolvimento Tecnológico</h4>
+                        <p>Implantação do agente virtual Plur 2, sistemas de rotinas e páginas web dedicadas a projetos estratégicos.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <footer>
+        <p>Desenvolvido com padrão <strong>Live V6.0</strong> por <strong>Live Consultoria</strong> &bull; Ecossistema Live</p>
+    </footer>
+
+    <script>
+        window.onscroll = function() {
+            let winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            let height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            let scrolled = (winScroll / height) * 100;
+            document.getElementById("progressBar").style.width = scrolled + "%";
+        };
+    </script>
+</body>
+</html>

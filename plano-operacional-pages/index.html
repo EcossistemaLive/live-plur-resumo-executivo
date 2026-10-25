@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plur - Passo a Passo Operacional</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --green: #8ec63f;
+            --teal: #28a3c8;
+            --blue: #2e64b0;
+            --indigo: #3b3f9a;
+            --violet: #6d4aa7;
+            --plur: #5e35a8;
+            --ink: #1c1b22;
+            --slate: #58595b;
+            --mist: #6b6b73;
+            --paper: #ffffff;
+            --paper-2: #f6f5f9;
+            --line: rgba(28,27,34,.10);
+            --grad: linear-gradient(100deg, var(--green) 0%, var(--teal) 32%, var(--blue) 58%, var(--violet) 100%);
+            --grad-soft: linear-gradient(120deg, rgba(142,198,63,.14), rgba(40,163,200,.14), rgba(109,74,167,.16));
+            --shadow: 0 24px 60px -28px rgba(59,63,154,.45);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            color: var(--ink);
+            background: var(--paper-2);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        h1, h2, h3, h4 {
+            font-family: 'Sora', sans-serif;
+            letter-spacing: -0.02em;
+        }
+
+        .header {
+            background: radial-gradient(120% 120% at 15% 10%, #123a63 0%, #0e2447 40%, #241a4a 78%, #1a1338 100%);
+            color: #fff;
+            padding: 80px 20px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: "";
+            position: absolute;
+            top: -120px;
+            right: -80px;
+            width: 520px;
+            height: 520px;
+            background: var(--violet);
+            border-radius: 50%;
+            filter: blur(70px);
+            opacity: 0.5;
+            z-index: 0;
+        }
+
+        .header::after {
+            content: "";
+            position: absolute;
+            bottom: -140px;
+            left: -100px;
+            width: 460px;
+            height: 460px;
+            background: var(--teal);
+            border-radius: 50%;
+            filter: blur(70px);
+            opacity: 0.5;
+            z-index: 0;
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 2;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .header h1 {
+            font-size: clamp(2rem, 4vw, 3rem);
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            color: rgba(255, 255, 255, 0.8);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: -40px auto 60px;
+            padding: 0 20px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .card {
+            background: var(--paper);
+            border-radius: 16px;
+            padding: 40px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--line);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--line);
+        }
+
+        .card-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background: var(--grad-soft);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .card-title h2 {
+            font-size: 1.5rem;
+            color: var(--plur);
+            font-weight: 600;
+        }
+
+        .step-list {
+            list-style: none;
+        }
+
+        .step-item {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        .step-item:not(:last-child)::after {
+            content: "";
+            position: absolute;
+            left: 17px;
+            top: 40px;
+            bottom: -15px;
+            width: 2px;
+            background: var(--line);
+        }
+
+        .step-number {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--grad);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Sora', sans-serif;
+            font-weight: 700;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+            z-index: 2;
+        }
+
+        .step-content {
+            padding-top: 5px;
+        }
+
+        .step-content h3 {
+            font-size: 1.1rem;
+            color: var(--ink);
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .step-content p {
+            color: var(--slate);
+            font-size: 0.95rem;
+            margin-bottom: 10px;
+        }
+
+        .tag {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 100px;
+            font-size: 0.75rem;
+            font-family: 'Sora', sans-serif;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-right: 8px;
+            margin-bottom: 8px;
+        }
+
+        .tag-urgent {
+            background: rgba(200, 40, 40, 0.1);
+            color: #c82828;
+        }
+
+        .tag-routine {
+            background: rgba(40, 163, 200, 0.1);
+            color: var(--teal);
+        }
+
+        .tag-strategic {
+            background: rgba(142, 198, 63, 0.1);
+            color: #659325;
+        }
+
+        .tag-owner {
+            background: var(--paper-2);
+            color: var(--slate);
+            border: 1px solid var(--line);
+        }
+
+        .footer {
+            text-align: center;
+            padding: 40px;
+            color: var(--mist);
+            font-size: 0.9rem;
+            border-top: 1px solid var(--line);
+            margin-top: 40px;
+        }
+
+        @media (max-width: 768px) {
+            .card {
+                padding: 25px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <div class="header-content">
+            <h1>Plano de Ação Operacional</h1>
+            <p>Passo a passo detalhado para execução da estratégia de rentabilização, expansão e estruturação da Plur.</p>
+        </div>
+    </header>
+
+    <div class="container">
+        
+        <!-- Frente 1: Financeiro -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-icon">💼</div>
+                <div class="card-title">
+                    <h2>Frente 1: Estruturação Financeira e Operacional</h2>
+                </div>
+            </div>
+            
+            <ul class="step-list">
+                <li class="step-item">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h3>Definição do Acordo de Transição (Morgana)</h3>
+                        <p>Formalizar o período de teste de 3 meses. O objetivo é assegurar previsibilidade financeira para ela (R$ 5.000/mês) enquanto ela mapeia e assume os processos da Plur.</p>
+                        <span class="tag tag-urgent">Curto Prazo</span>
+                        <span class="tag tag-owner">Resp: Sócios / Morgana</span>
+                    </div>
+                </li>
+                <li class="step-item">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h3>Estabelecimento de Rotina de Pagamentos</h3>
+                        <p>Criar regras rígidas de fluxo de caixa. Exemplo: pagamentos de fornecedores e contas apenas às terças e quintas. Isso muda a dinâmica da operação e reduz compras por impulso.</p>
+                        <span class="tag tag-routine">Rotina</span>
+                        <span class="tag tag-owner">Resp: Morgana</span>
+                    </div>
+                </li>
+                <li class="step-item">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h3>Fechamento Mensal e Reporte de Ruídos</h3>
+                        <p>Ao final dos primeiros 30 dias, Morgana deve apresentar quais contas ainda estão fora da rotina (ruídos) e quais ajustes a recepção/sócios precisam fazer no uso do cartão corporativo e prestação de contas.</p>
+                        <span class="tag tag-strategic">Controle</span>
+                        <span class="tag tag-owner">Resp: Morgana / Sócios</span>
+                    </div>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Frente 2: Marketing -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-icon">📱</div>
+                <div class="card-title">
+                    <h2>Frente 2: Execução de Marketing e Autoridade</h2>
+                </div>
+            </div>
+            
+            <ul class="step-list">
+                <li class="step-item">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h3>Recuperação do Mapa Estratégico</h3>
+                        <p>Acessar o MindMeister e baixar em PDF o planejamento estratégico (Posicionamento, Tom de Voz, Jornada do Cliente) desenhado anteriormente pela Marina.</p>
+                        <span class="tag tag-urgent">Imediato</span>
+                        <span class="tag tag-owner">Resp: Sócio</span>
+                    </div>
+                </li>
+                <li class="step-item">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h3>Mentoria / Kick-off de Execução</h3>
+                        <p>Reunião com a nova equipe (as meninas), o sócio e o consultor para alinhar o cronograma tático. Foco: 4 a 5 posts semanais + stories diários baseados no funil (Descoberta -> Aquecimento -> Venda).</p>
+                        <span class="tag tag-strategic">Alinhamento</span>
+                        <span class="tag tag-owner">Resp: Consultor / Marketing</span>
+                    </div>
+                </li>
+                <li class="step-item">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h3>Gravação do Conteúdo "Manifesto"</h3>
+                        <p>Sócio (Theo) deve gravar o vídeo de posicionamento reforçando que aplica a metodologia de "movimento inteligente" há 11 anos, antes de ser "hype". Posicionamento firme como criador e autoridade.</p>
+                        <span class="tag tag-urgent">Conteúdo</span>
+                        <span class="tag tag-owner">Resp: Theo</span>
+                    </div>
+                </li>
+                <li class="step-item">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <h3>Monitoramento de Funil e Recepção</h3>
+                        <p>Acompanhamento semanal de leads gerados pelo Marketing e a taxa de conversão do Rafael (Recepção). Metrificar o ROI do investimento em Social Media.</p>
+                        <span class="tag tag-routine">Rotina</span>
+                        <span class="tag tag-owner">Resp: Rafael / Marketing</span>
+                    </div>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Frente 3: Expansão -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-icon">📈</div>
+                <div class="card-title">
+                    <h2>Frente 3: Expansão (Projeto Padel / Networking)</h2>
+                </div>
+            </div>
+            
+            <ul class="step-list">
+                <li class="step-item">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h3>Plano de Negócios do Rooftop Padel</h3>
+                        <p>Levantamento real de custos: CAPEX (Banheira de Gelo ~20k, macas, infraestrutura) e OPEX. Cálculo da capacidade operacional: Quantos clientes cabem? Qual o ponto de equilíbrio e o retorno esperado?</p>
+                        <span class="tag tag-strategic">Estratégico</span>
+                        <span class="tag tag-owner">Resp: Sócios / Consultor</span>
+                    </div>
+                </li>
+                <li class="step-item">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h3>Definição do Produto "Iska" (Pilates)</h3>
+                        <p>Estabelecer que o Pilates é a âncora do novo espaço. O Recovery (Gelo/Sauna) entra como upsell ou serviço agregado. A unidade Padel será tratada primariamente como uma vitrine para captação de leads de alto padrão para a unidade central.</p>
+                        <span class="tag tag-strategic">Produto</span>
+                    </div>
+                </li>
+                <li class="step-item">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h3>Proposta Formal e Apresentação</h3>
+                        <p>Com o Plano de Negócios aprovado, criar a apresentação para os sócios do complexo de Padel (Rodrigo). Mostrar que o fluxo natural de 2 quadras requer o Pilates para dar giro e viabilizar o Recovery.</p>
+                        <span class="tag tag-urgent">Médio Prazo</span>
+                        <span class="tag tag-owner">Resp: Theo</span>
+                    </div>
+                </li>
+                <li class="step-item">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <h3>Nutrição de Networking B2B</h3>
+                        <p>Manter a agenda de contatos informais com figuras chaves (Sassini). O objetivo é firmar o nome da clínica/estúdio como referência para encaminhamentos de pré e pós operatório (trauma/ortopedia), sem forçar vendas diretas imediatas.</p>
+                        <span class="tag tag-routine">Rotina</span>
+                        <span class="tag tag-owner">Resp: Theo</span>
+                    </div>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Frente 4: Eventos -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-icon">🎉</div>
+                <div class="card-title">
+                    <h2>Frente 4: Evento de Aniversário (11 Anos)</h2>
+                </div>
+            </div>
+            
+            <ul class="step-list">
+                <li class="step-item">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h3>Comunicação do Formato Colaborativo</h3>
+                        <p>Disparar comunicação (WhatsApp/Insta) para os alunos convidando para o evento do dia 29. Deixar claro o formato "Traga sua guarnição/bebida", alinhando as expectativas e abraçando a cultura de comunidade da Plur.</p>
+                        <span class="tag tag-urgent">Curto Prazo</span>
+                        <span class="tag tag-owner">Resp: Marketing / Recepção</span>
+                    </div>
+                </li>
+                <li class="step-item">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h3>Gestão de Custos do Evento</h3>
+                        <p>Evitar o modelo de "comprar para não sobrar" custeado pela empresa. Toda a alimentação deve ser via crowdfunding dos alunos ou trazida por eles, garantindo que o evento seja rentável ou de custo zero para a marca.</p>
+                        <span class="tag tag-strategic">Controle</span>
+                        <span class="tag tag-owner">Resp: Morgana</span>
+                    </div>
+                </li>
+            </ul>
+        </div>
+
+    </div>
+
+    <footer class="footer">
+        <p>Plur & VivaFisio &copy; 2026. Documento Operacional Confidencial.</p>
+    </footer>
+
+</body>
+</html>

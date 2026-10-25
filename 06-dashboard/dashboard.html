@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard de Acompanhamento — Plur</title>
+<!--
+  Template de Dashboard de Acompanhamento (Kanban) — Consultoria
+
+  COMO USAR:
+  1. Copie este arquivo para a pasta 06-dashboard/ do cliente.
+  2. Renomeie para dashboard.html.
+  3. Edite o JSON de dados no bloco <script id="dados-iniciais"> abaixo:
+     - Substitua Plur pelo nome real do cliente.
+     - Substitua [IDENTIDADE_VISUAL] por 'live' ou 'vidi' conforme empresa responsável.
+     - Adicione/edite os departamentos e demandas.
+  4. Abra no navegador. Edições feitas pela interface ficam salvas no localStorage do
+     próprio navegador. Use os botões "Exportar JSON" e "Importar JSON" para
+     versionar e compartilhar entre máquinas.
+-->
+<style>
+  /* ============================================================
+     IDENTIDADE VISUAL (alternar entre Live e ViDI editando data-tema no <body>)
+     ============================================================ */
+
+  :root[data-tema="live"] {
+    --cor-fundo: #06192a;
+    --cor-superficie: #0d2840;
+    --cor-superficie-2: #143655;
+    --cor-borda: rgba(255,255,255,0.08);
+    --cor-borda-ativa: #00e800;
+    --cor-acento: #00e800;
+    --cor-acento-suave: rgba(0,232,0,0.15);
+    --cor-texto: #ffffff;
+    --cor-texto-suave: #b5c5d3;
+    --cor-perigo: #ff3b3b;
+    --cor-atencao: #ffb84d;
+    --cor-ok: #00e800;
+    --fonte-titulo: 'Poppins', sans-serif;
+    --fonte-texto: 'Merriweather', serif;
+  }
+
+  /* ViDI: placeholder até receber o manual da marca. Cores atuais são genéricas. */
+  :root[data-tema="vidi"] {
+    --cor-fundo: #1a1a2e;
+    --cor-superficie: #232342;
+    --cor-superficie-2: #2d2d4f;
+    --cor-borda: rgba(255,255,255,0.08);
+    --cor-borda-ativa: #f0a500;
+    --cor-acento: #f0a500;
+    --cor-acento-suave: rgba(240,165,0,0.15);
+    --cor-texto: #ffffff;
+    --cor-texto-suave: #c4c4d4;
+    --cor-perigo: #ff3b3b;
+    --cor-atencao: #ffb84d;
+    --cor-ok: #4cd964;
+    --fonte-titulo: 'Poppins', sans-serif;
+    --fonte-texto: 'Merriweather', serif;
+  }
+
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Merriweather:wght@400;700&display=swap');
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: var(--fonte-titulo);
+    background: var(--cor-fundo);
+    color: var(--cor-texto);
+    min-height: 100vh;
+    padding: 24px;
+  }
+
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--cor-borda);
+  }
+
+  header .titulo {
+    font-size: 24px;
+    font-weight: 600;
+  }
+
+  header .subtitulo {
+    color: var(--cor-texto-suave);
+    font-size: 13px;
+    margin-top: 4px;
+  }
+
+  .acoes {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .btn {
+    background: var(--cor-superficie);
+    color: var(--cor-texto);
+    border: 1px solid var(--cor-borda);
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+
+  .btn:hover { background: var(--cor-superficie-2); border-color: var(--cor-borda-ativa); }
+  .btn.primario { background: var(--cor-acento); color: var(--cor-fundo); border: none; font-weight: 600; }
+  .btn.primario:hover { filter: brightness(1.1); }
+  .btn.perigo { background: transparent; border-color: var(--cor-perigo); color: var(--cor-perigo); }
+
+  /* ============================================================
+     ABAS POR DEPARTAMENTO
+     ============================================================ */
+
+  .abas {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid var(--cor-borda);
+    overflow-x: auto;
+  }
+
+  .aba {
+    padding: 10px 18px;
+    background: transparent;
+    border: none;
+    color: var(--cor-texto-suave);
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 500;
+    border-bottom: 2px solid transparent;
+    transition: all 0.15s ease;
+    white-space: nowrap;
+  }
+
+  .aba:hover { color: var(--cor-texto); }
+
+  .aba.ativa {
+    color: var(--cor-acento);
+    border-bottom-color: var(--cor-acento);
+  }
+
+  .aba .contagem {
+    display: inline-block;
+    margin-left: 6px;
+    background: var(--cor-superficie-2);
+    color: var(--cor-texto-suave);
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 11px;
+  }
+
+  .aba.ativa .contagem {
+    background: var(--cor-acento-suave);
+    color: var(--cor-acento);
+  }
+
+  /* ============================================================
+     COLUNAS DO KANBAN
+     ============================================================ */
+
+  .kanban {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 16px;
+    overflow-x: auto;
+    padding-bottom: 16px;
+  }
+
+  .coluna {
+    background: var(--cor-superficie);
+    border: 1px solid var(--cor-borda);
+    border-radius: 12px;
+    padding: 12px;
+    min-height: 200px;
+  }
+
+  .coluna-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--cor-borda);
+  }
+
+  .coluna-titulo {
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .coluna-contagem {
+    background: var(--cor-superficie-2);
+    color: var(--cor-texto-suave);
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 11px;
+  }
+
+  /* Cores semânticas por status (corner) */
+  .coluna[data-status="a-fazer"] .coluna-titulo { color: var(--cor-texto-suave); }
+  .coluna[data-status="em-andamento"] .coluna-titulo { color: var(--cor-atencao); }
+  .coluna[data-status="em-revisao"] .coluna-titulo { color: var(--cor-acento); }
+  .coluna[data-status="concluido"] .coluna-titulo { color: var(--cor-ok); }
+  .coluna[data-status="bloqueado"] .coluna-titulo { color: var(--cor-perigo); }
+
+  /* ============================================================
+     CARDS DE DEMANDA
+     ============================================================ */
+
+  .cards { display: flex; flex-direction: column; gap: 8px; }
+
+  .card {
+    background: var(--cor-superficie-2);
+    border: 1px solid var(--cor-borda);
+    border-left-width: 4px;
+    border-radius: 8px;
+    padding: 12px;
+    cursor: grab;
+    transition: all 0.15s ease;
+  }
+
+  .card:hover { border-color: var(--cor-borda-ativa); transform: translateY(-1px); }
+  .card.arrastando { opacity: 0.4; cursor: grabbing; }
+
+  .card[data-prioridade="alta"] { border-left-color: var(--cor-perigo); }
+  .card[data-prioridade="media"] { border-left-color: var(--cor-atencao); }
+  .card[data-prioridade="baixa"] { border-left-color: var(--cor-texto-suave); }
+
+  .card-titulo {
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 8px;
+    line-height: 1.4;
+  }
+
+  .card-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    font-size: 11px;
+    color: var(--cor-texto-suave);
+  }
+
+  .card-tag {
+    background: var(--cor-fundo);
+    padding: 2px 8px;
+    border-radius: 4px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .card-tag.prioridade-alta { color: var(--cor-perigo); }
+  .card-tag.prioridade-media { color: var(--cor-atencao); }
+  .card-tag.prioridade-baixa { color: var(--cor-texto-suave); }
+
+  .card-tag.atrasado { background: var(--cor-perigo); color: white; font-weight: 600; }
+
+  .card-acoes {
+    display: none;
+    gap: 4px;
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid var(--cor-borda);
+  }
+
+  .card:hover .card-acoes { display: flex; }
+
+  .card-acoes button {
+    background: transparent;
+    border: 1px solid var(--cor-borda);
+    color: var(--cor-texto-suave);
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    cursor: pointer;
+  }
+
+  .card-acoes button:hover { color: var(--cor-texto); border-color: var(--cor-borda-ativa); }
+
+  .botao-adicionar {
+    width: 100%;
+    background: transparent;
+    border: 1px dashed var(--cor-borda);
+    color: var(--cor-texto-suave);
+    padding: 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 12px;
+    margin-top: 8px;
+  }
+
+  .botao-adicionar:hover {
+    border-color: var(--cor-acento);
+    color: var(--cor-acento);
+  }
+
+  /* ============================================================
+     MODAL DE EDIÇÃO
+     ============================================================ */
+
+  .modal-fundo {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+
+  .modal-fundo.ativo { display: flex; }
+
+  .modal {
+    background: var(--cor-superficie);
+    border: 1px solid var(--cor-borda);
+    border-radius: 12px;
+    padding: 24px;
+    width: 100%;
+    max-width: 500px;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+
+  .modal h2 { font-size: 18px; margin-bottom: 16px; }
+  .modal label { display: block; font-size: 12px; color: var(--cor-texto-suave); margin-bottom: 4px; margin-top: 12px; }
+  .modal input, .modal select, .modal textarea {
+    width: 100%;
+    background: var(--cor-fundo);
+    border: 1px solid var(--cor-borda);
+    color: var(--cor-texto);
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 14px;
+  }
+  .modal textarea { resize: vertical; min-height: 60px; }
+  .modal-acoes { display: flex; gap: 8px; margin-top: 20px; justify-content: flex-end; }
+
+  /* ============================================================
+     FOOTER
+     ============================================================ */
+
+  footer {
+    margin-top: 32px;
+    padding-top: 16px;
+    border-top: 1px solid var(--cor-borda);
+    color: var(--cor-texto-suave);
+    font-size: 11px;
+    text-align: center;
+    font-style: italic;
+  }
+
+  @media (max-width: 600px) {
+    body { padding: 12px; }
+    .kanban { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body data-tema="live">
+
+<header>
+  <div>
+    <div class="titulo">Dashboard de Acompanhamento — <span id="nome-cliente">Plur</span></div>
+    <div class="subtitulo">
+      Atualizado em <span id="data-atual">—</span> · Total de demandas: <span id="total-demandas">0</span>
+    </div>
+  </div>
+  <div class="acoes">
+    <button class="btn" onclick="exportarJSON()">⬇ Exportar JSON</button>
+    <button class="btn" onclick="document.getElementById('importar-input').click()">⬆ Importar JSON</button>
+    <input type="file" id="importar-input" accept=".json" style="display:none" onchange="importarJSON(event)">
+    <button class="btn" onclick="alternarTema()">🎨 Tema</button>
+    <button class="btn primario" onclick="abrirModal()">+ Nova demanda</button>
+  </div>
+</header>
+
+<nav class="abas" id="abas"></nav>
+
+<main class="kanban" id="kanban"></main>
+
+<footer>
+  Dashboard de acompanhamento — Consultoria · Edite as demandas pela interface ou pelo JSON exportado.
+</footer>
+
+<!-- ============================================================
+     MODAL DE EDIÇÃO/CRIAÇÃO DE DEMANDA
+     ============================================================ -->
+<div class="modal-fundo" id="modal">
+  <div class="modal">
+    <h2 id="modal-titulo">Nova demanda</h2>
+    <input type="hidden" id="campo-id">
+
+    <label for="campo-titulo">Título</label>
+    <input type="text" id="campo-titulo" placeholder="Ex.: Mapear processos do setor financeiro">
+
+    <label for="campo-descricao">Descrição (opcional)</label>
+    <textarea id="campo-descricao" placeholder="Detalhes adicionais sobre a demanda"></textarea>
+
+    <label for="campo-departamento">Departamento</label>
+    <select id="campo-departamento"></select>
+
+    <label for="campo-status">Status</label>
+    <select id="campo-status">
+      <option value="a-fazer">A fazer</option>
+      <option value="em-andamento">Em andamento</option>
+      <option value="em-revisao">Em revisão</option>
+      <option value="concluido">Concluído</option>
+      <option value="bloqueado">Bloqueado</option>
+    </select>
+
+    <label for="campo-responsavel">Responsável</label>
+    <input type="text" id="campo-responsavel" placeholder="Nome da pessoa">
+
+    <label for="campo-prazo">Prazo de finalização</label>
+    <input type="date" id="campo-prazo">
+
+    <label for="campo-prioridade">Prioridade</label>
+    <select id="campo-prioridade">
+      <option value="alta">Alta</option>
+      <option value="media" selected>Média</option>
+      <option value="baixa">Baixa</option>
+    </select>
+
+    <div class="modal-acoes">
+      <button class="btn perigo" id="btn-excluir" onclick="excluirDemanda()" style="display:none">Excluir</button>
+      <button class="btn" onclick="fecharModal()">Cancelar</button>
+      <button class="btn primario" onclick="salvarDemanda()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     DADOS INICIAIS — EDITE AQUI PARA POPULAR O DASHBOARD INICIAL.
+     Depois de aberto pela primeira vez, alterações são salvas no
+     localStorage do navegador. Use "Exportar JSON" para versionar.
+     ============================================================ -->
+<script id="dados-iniciais" type="application/json">
+{
+  "cliente": "Plur",
+  "tema": "live",
+  "departamentos": [
+    { "id": "geral", "nome": "Geral" },
+    { "id": "financeiro", "nome": "Financeiro" },
+    { "id": "comercial", "nome": "Comercial" },
+    { "id": "operacoes", "nome": "Operações" },
+    { "id": "pessoas", "nome": "Pessoas / RH" },
+    { "id": "marketing", "nome": "Marketing" }
+  ],
+  "demandas": [
+    {
+      "id": "demo-1",
+      "titulo": "Exemplo: Levantamento inicial de processos",
+      "descricao": "Mapear processos existentes em cada área. Atualizar quando finalizado.",
+      "departamento": "geral",
+      "status": "a-fazer",
+      "responsavel": "A definir",
+      "prazo": "",
+      "prioridade": "media"
+    }
+  ]
+}
+</script>
+
+<script>
+// ============================================================
+// ESTADO E PERSISTÊNCIA
+// ============================================================
+
+const CHAVE_STORAGE = 'dashboard-consultoria-Plur';
+let estado = null;
+let abaAtiva = 'geral';
+const COLUNAS = [
+  { id: 'a-fazer', nome: 'A fazer' },
+  { id: 'em-andamento', nome: 'Em andamento' },
+  { id: 'em-revisao', nome: 'Em revisão' },
+  { id: 'concluido', nome: 'Concluído' },
+  { id: 'bloqueado', nome: 'Bloqueado' }
+];
+
+function carregarEstado() {
+  const salvo = localStorage.getItem(CHAVE_STORAGE);
+  if (salvo) {
+    try { return JSON.parse(salvo); } catch(e) { console.warn('JSON salvo inválido, usando dados iniciais'); }
+  }
+  const dadosIniciais = document.getElementById('dados-iniciais').textContent;
+  return JSON.parse(dadosIniciais);
+}
+
+function salvarEstado() {
+  localStorage.setItem(CHAVE_STORAGE, JSON.stringify(estado));
+}
+
+// ============================================================
+// RENDERIZAÇÃO
+// ============================================================
+
+function renderizarTudo() {
+  document.body.setAttribute('data-tema', estado.tema || 'live');
+  document.documentElement.setAttribute('data-tema', estado.tema || 'live');
+  document.getElementById('nome-cliente').textContent = estado.cliente;
+  document.getElementById('total-demandas').textContent = estado.demandas.length;
+  document.getElementById('data-atual').textContent = new Date().toLocaleDateString('pt-BR');
+  document.title = `Dashboard de Acompanhamento — ${estado.cliente}`;
+  renderizarAbas();
+  renderizarKanban();
+  popularSelectDepartamentos();
+  salvarEstado();
+}
+
+function renderizarAbas() {
+  const abas = document.getElementById('abas');
+  abas.innerHTML = '';
+  estado.departamentos.forEach(dep => {
+    const qtd = estado.demandas.filter(d => d.departamento === dep.id).length;
+    const btn = document.createElement('button');
+    btn.className = 'aba' + (dep.id === abaAtiva ? ' ativa' : '');
+    btn.innerHTML = `${dep.nome}<span class="contagem">${qtd}</span>`;
+    btn.onclick = () => { abaAtiva = dep.id; renderizarTudo(); };
+    abas.appendChild(btn);
+  });
+}
+
+function renderizarKanban() {
+  const kanban = document.getElementById('kanban');
+  kanban.innerHTML = '';
+  const demandasDaAba = estado.demandas.filter(d => d.departamento === abaAtiva);
+
+  COLUNAS.forEach(col => {
+    const demandasDaColuna = demandasDaAba.filter(d => d.status === col.id);
+    const div = document.createElement('div');
+    div.className = 'coluna';
+    div.setAttribute('data-status', col.id);
+    div.ondragover = (e) => { e.preventDefault(); };
+    div.ondrop = (e) => {
+      e.preventDefault();
+      const id = e.dataTransfer.getData('text/plain');
+      const demanda = estado.demandas.find(d => d.id === id);
+      if (demanda) { demanda.status = col.id; renderizarTudo(); }
+    };
+
+    div.innerHTML = `
+      <div class="coluna-header">
+        <span class="coluna-titulo">${col.nome}</span>
+        <span class="coluna-contagem">${demandasDaColuna.length}</span>
+      </div>
+      <div class="cards"></div>
+      <button class="botao-adicionar" onclick="abrirModal(null, '${col.id}')">+ Adicionar</button>
+    `;
+
+    const containerCards = div.querySelector('.cards');
+    demandasDaColuna.forEach(d => containerCards.appendChild(criarCard(d)));
+    kanban.appendChild(div);
+  });
+}
+
+function criarCard(d) {
+  const card = document.createElement('div');
+  card.className = 'card';
+  card.setAttribute('draggable', 'true');
+  card.setAttribute('data-prioridade', d.prioridade);
+  card.ondragstart = (e) => { e.dataTransfer.setData('text/plain', d.id); card.classList.add('arrastando'); };
+  card.ondragend = () => card.classList.remove('arrastando');
+  card.ondblclick = () => abrirModal(d.id);
+
+  const atrasado = d.prazo && new Date(d.prazo) < new Date() && d.status !== 'concluido';
+  const prazoFmt = d.prazo ? new Date(d.prazo + 'T12:00:00').toLocaleDateString('pt-BR') : '—';
+
+  card.innerHTML = `
+    <div class="card-titulo">${escaparHTML(d.titulo)}</div>
+    <div class="card-meta">
+      <span class="card-tag">👤 ${escaparHTML(d.responsavel || '—')}</span>
+      <span class="card-tag ${atrasado ? 'atrasado' : ''}">📅 ${prazoFmt}</span>
+      <span class="card-tag prioridade-${d.prioridade}">⚡ ${d.prioridade}</span>
+    </div>
+    <div class="card-acoes">
+      <button onclick="abrirModal('${d.id}')">Editar</button>
+    </div>
+  `;
+  return card;
+}
+
+function escaparHTML(s) {
+  return (s || '').replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+}
+
+function popularSelectDepartamentos() {
+  const sel = document.getElementById('campo-departamento');
+  sel.innerHTML = '';
+  estado.departamentos.forEach(dep => {
+    const opt = document.createElement('option');
+    opt.value = dep.id;
+    opt.textContent = dep.nome;
+    sel.appendChild(opt);
+  });
+}
+
+// ============================================================
+// MODAL
+// ============================================================
+
+let idEmEdicao = null;
+
+function abrirModal(id = null, statusPreSelecionado = null) {
+  idEmEdicao = id;
+  const modal = document.getElementById('modal');
+  modal.classList.add('ativo');
+  const btnExcluir = document.getElementById('btn-excluir');
+
+  if (id) {
+    const d = estado.demandas.find(x => x.id === id);
+    document.getElementById('modal-titulo').textContent = 'Editar demanda';
+    document.getElementById('campo-id').value = d.id;
+    document.getElementById('campo-titulo').value = d.titulo;
+    document.getElementById('campo-descricao').value = d.descricao || '';
+    document.getElementById('campo-departamento').value = d.departamento;
+    document.getElementById('campo-status').value = d.status;
+    document.getElementById('campo-responsavel').value = d.responsavel || '';
+    document.getElementById('campo-prazo').value = d.prazo || '';
+    document.getElementById('campo-prioridade').value = d.prioridade;
+    btnExcluir.style.display = 'inline-block';
+  } else {
+    document.getElementById('modal-titulo').textContent = 'Nova demanda';
+    document.getElementById('campo-id').value = '';
+    document.getElementById('campo-titulo').value = '';
+    document.getElementById('campo-descricao').value = '';
+    document.getElementById('campo-departamento').value = abaAtiva;
+    document.getElementById('campo-status').value = statusPreSelecionado || 'a-fazer';
+    document.getElementById('campo-responsavel').value = '';
+    document.getElementById('campo-prazo').value = '';
+    document.getElementById('campo-prioridade').value = 'media';
+    btnExcluir.style.display = 'none';
+  }
+}
+
+function fecharModal() {
+  document.getElementById('modal').classList.remove('ativo');
+  idEmEdicao = null;
+}
+
+function salvarDemanda() {
+  const titulo = document.getElementById('campo-titulo').value.trim();
+  if (!titulo) { alert('Título é obrigatório'); return; }
+
+  const dados = {
+    titulo,
+    descricao: document.getElementById('campo-descricao').value.trim(),
+    departamento: document.getElementById('campo-departamento').value,
+    status: document.getElementById('campo-status').value,
+    responsavel: document.getElementById('campo-responsavel').value.trim(),
+    prazo: document.getElementById('campo-prazo').value,
+    prioridade: document.getElementById('campo-prioridade').value
+  };
+
+  if (idEmEdicao) {
+    const idx = estado.demandas.findIndex(d => d.id === idEmEdicao);
+    estado.demandas[idx] = { ...estado.demandas[idx], ...dados };
+  } else {
+    dados.id = 'd-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6);
+    estado.demandas.push(dados);
+    abaAtiva = dados.departamento;
+  }
+  fecharModal();
+  renderizarTudo();
+}
+
+function excluirDemanda() {
+  if (!confirm('Excluir esta demanda? A ação não pode ser desfeita.')) return;
+  estado.demandas = estado.demandas.filter(d => d.id !== idEmEdicao);
+  fecharModal();
+  renderizarTudo();
+}
+
+// ============================================================
+// EXPORTAÇÃO / IMPORTAÇÃO
+// ============================================================
+
+function exportarJSON() {
+  const blob = new Blob([JSON.stringify(estado, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const data = new Date().toISOString().slice(0, 10);
+  a.href = url;
+  a.download = `dashboard_${estado.cliente.toLowerCase().replace(/\s+/g, '-')}_${data}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function importarJSON(evento) {
+  const arquivo = evento.target.files[0];
+  if (!arquivo) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const novo = JSON.parse(e.target.result);
+      if (!novo.demandas || !novo.departamentos) throw new Error('JSON inválido');
+      if (!confirm(`Substituir o dashboard atual pelo arquivo ${arquivo.name}?`)) return;
+      estado = novo;
+      renderizarTudo();
+      alert('Importado com sucesso.');
+    } catch (err) {
+      alert('Erro ao importar: ' + err.message);
+    }
+  };
+  reader.readAsText(arquivo);
+  evento.target.value = '';
+}
+
+function alternarTema() {
+  estado.tema = estado.tema === 'live' ? 'vidi' : 'live';
+  renderizarTudo();
+}
+
+// ============================================================
+// INICIALIZAÇÃO
+// ============================================================
+
+estado = carregarEstado();
+renderizarTudo();
+document.getElementById('modal').addEventListener('click', (e) => {
+  if (e.target.id === 'modal') fecharModal();
+});
+</script>
+
+</body>
+</html>
